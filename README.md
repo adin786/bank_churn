@@ -4,6 +4,7 @@ Churn modelling project for bank customer dataset.
 # Where is the code:
 - You can see how the data was cleaned and analysed inside the notebook file  `churn_analysis.ipynb`:
   - A trained version of the best model was exported as `model.pkl`
+  - A link to the notebook is [link on nbviewer.org](https://nbviewer.org/github/adin786/bank_churn/blob/main/churn_analysis.ipynb)
 - A .py file called `churn_predict.py` offers 2 useful functions:
   - `classify_pretrained()` loads the pre-trained model above, and predicts churn status.
   - `classify` loads the `BankChurners.csv` file, trains a classifier model on it, and predicts churn status. **NOT FULLY IMPLEMENTED YET)**
