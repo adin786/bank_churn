@@ -2,7 +2,7 @@
 Churn modelling project for bank customer dataset.
 
 ## Code overview:
-- `churn_analysis.ipynb` - Notebook containing the full modelling process including data cleaning, exploration, model training and evaluation
+- `churn_analysis.ipynb` - Notebook containing the full modelling process including data cleaning, exploration, model training and evaluation [link to view the notebook](https://nbviewer.org/github/adin786/bank_churn/blob/main/churn_analysis.ipynb).
   - A trained version of the best model was exported as `model.pkl`
 - `app/clf_funcs.py` containing
   - `classify()` function which loads the pre-trained model above, and predicts churn status on a single customer record.
