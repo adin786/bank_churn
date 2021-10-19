@@ -91,6 +91,7 @@ I considered metrics:
 - F1 score
 - AUC
 - Mean and std_dev of cross validation scores (accuracy)
+
 In this project I mainly looked for good f1 scores, since the plain *accuracy* metric is heavily skewed by the class imbalance in the raw data.
 
 ### Would you change your solution in any way if the input dataset was much larger (e.g. 10GB)?
