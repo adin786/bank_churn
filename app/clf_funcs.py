@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder, OneHotEncoder
+from sklearn.impute import SimpleImputer
 
 class OrdinalEncoder_custom(TransformerMixin, BaseEstimator):
     '''wraps OrdinalEncoder to enable .get_feature_names_out() method.'''
@@ -42,10 +43,10 @@ def fill_incomes(df):
 def preprocess_raw(df):
     df.columns = df.columns.str.lower()
     
-    df = df.drop(columns='unnamed: 21')
+    df = df.drop(columns='unnamed: 21') if 'unnamed: 21' in df.columns else df
     
     df.loc[:,'churn'] = (df['attrition_flag'] == 'Attrited Customer').astype(int)
-    df = df.drop(columns='attrition_flag')
+    df = df.drop(columns='attrition_flag') if 'attrition_flag' in df.columns else df
     df.churn.value_counts()
     
     df.loc[:,'gender'] = df.gender.astype('category')
@@ -68,62 +69,77 @@ def preprocess_raw(df):
     
     return df
 
-def classify(customer={}):
-    path = os.path.join('data','BankChurners.csv')
-    df = preprocess_raw(pd.read_csv(path))
-
-    # Train test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Set up sklearn pipeline to organise ml training steps
-    num_features = X_train.select_dtypes(include=['int','float']).columns.tolist()
-    num_transformer = Pipeline([('imputer', SimpleImputer(strategy='median')),
-                                ('scaler', StandardScaler())])
-    # Ordinal features
-    ord_features = ['education_level']
-    ord_transformer = OrdinalEncoder_custom(categories=[['Unknown','Uneducated', 'High School', 'College', 'Graduate', 'Post-Graduate', 'Doctorate']])
-    # Categorical preprocessor
-    cat_features = ['gender', 'marital_status', 'income_category', 'card_category']
-    cat_transformer = OneHotEncoder(sparse=False, handle_unknown='ignore')
-    # Combined preprocessor
-    preprocessor = ColumnTransformer([('ords', ord_transformer, ord_features),
-                                    ('cats', cat_transformer, cat_features),
-                                    ('nums', num_transformer, num_features)],
-                                    remainder='drop')
-    clf = Pipeline([('preprocessor', preprocessor),
-                        ('xgbclf', XGBClassifier(eval_metric='logloss', use_label_encoder=False))])
-
-    start = time.time()
-    clf.fit(X_train,y_train)
-    end = time.time()
-    print(f'Time to train model: {end-start:.2f} seconds')
-
-    # X_pred = 
-    y = clf.predict(X_test)
-    return y
-
-def classify_pretrained(df):
-    print(df.iloc[0])
-    df = preprocess_raw(df.iloc[0])
-    print(df)
-    X = df
-    print(len(X))
-    if len(X) > 1:
+def predict(X):
+    '''Predict a result for the given X values'''
+    if len(X) > 1:  
         raise ValueError('Classify method only works with a single customer record')
-    
     with open('model.pkl','rb') as f:
         clf = pickle.load(f) 
-    y = clf.predict(X)
 
+    print(f'Preprocessed data (X): shape {X.shape}')
+    print(X.T)
+    y = clf.predict(X)
     churn = True if y[0] > 1 else False
     return churn
 
+def classify(CLIENTNUM=768805383,
+            Attrition_Flag='Existing Customer',
+            Customer_Age=45,
+            Gender='M',
+            Dependent_count=3,
+            Education_Level='High School',
+            Marital_Status='Married',
+            Income_Category='$60k - 80k',
+            Card_Category='Blue',
+            Months_on_book=39,
+            Total_Relationship_Count=5,
+            Months_Inactive_12_mon=1,
+            Contacts_Count_12_mon=3,
+            Credit_Limit=12691,
+            Total_Revolving_Bal=777,
+            Avg_Open_To_Buy=11914,
+            Total_Amt_Chng_Q4_Q1=1.335,
+            Total_Trans_Amt=1144,
+            Total_Trans_Ct=42,
+            Total_Ct_Chng_Q4_Q1=1.625,
+            Avg_Utilization_Ratio=0.061):
+    '''Classifies a single customer record with a churn prediction True or False'''
+
+    ser = pd.Series({
+        'CLIENTNUM':CLIENTNUM,
+        'Attrition_Flag':Attrition_Flag,
+        'Customer_Age':Customer_Age,
+        'Gender':Gender,
+        'Dependent_count':Dependent_count,
+        'Education_Level':Education_Level,
+        'Marital_Status':Marital_Status,
+        'Income_Category':Income_Category,
+        'Card_Category':Card_Category,
+        'Months_on_book':Months_on_book,
+        'Total_Relationship_Count':Total_Relationship_Count,
+        'Months_Inactive_12_mon':Months_Inactive_12_mon,
+        'Contacts_Count_12_mon':Contacts_Count_12_mon,
+        'Credit_Limit':Credit_Limit,
+        'Total_Revolving_Bal':Total_Revolving_Bal,
+        'Avg_Open_To_Buy':Avg_Open_To_Buy,
+        'Total_Amt_Chng_Q4_Q1':Total_Amt_Chng_Q4_Q1,
+        'Total_Trans_Amt':Total_Trans_Amt,
+        'Total_Trans_Ct':Total_Trans_Ct,
+        'Total_Ct_Chng_Q4_Q1':Total_Ct_Chng_Q4_Q1,
+        'Avg_Utilization_Ratio':Avg_Utilization_Ratio
+    })
+    X_raw = pd.DataFrame(ser).T
+    X = preprocess_raw(X_raw)
+
+    churn = predict(X)
+    print(f'\nPredicted churn status = {churn}')
+    return churn
+
+    
 
 if __name__ == '__main__':
-    # for testing, load a preprocessed dataset
-    path = os.path.join('data','BankChurners.csv')
-    df = preprocess_raw(pd.read_csv(path))
-    # print(df.head())
+    print('main')
+    churn = classify()
 
-    churn = classify_pretrained(df)
-    print(churn)
+else:
+    print('not main')
