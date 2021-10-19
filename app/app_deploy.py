@@ -85,7 +85,6 @@ if st.button('Compute a prediction'):
             total_ct_chng_q4_q1,
             avg_utilisation_ratio,
         )
-        churn=True
         st.success('Done')
 
     if churn:

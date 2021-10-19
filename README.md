@@ -9,28 +9,43 @@ Churn modelling project for bank customer dataset.
   - `classify` loads the `BankChurners.csv` file, trains a classifier model on it, and predicts churn status. **(NOT FULLY IMPLEMENTED YET)**
 
 # How to use
-To classify a single customer record you need to create a clean conda environment using the `environments.yaml` file:
+To classify a single customer record you need to create a clean conda environment using the `environments.yaml` file.  Run the following commands from the anaconda prompt to activate the environment and open a python REPL:
 ```bash
 conda env create --name bank_churn_model --file environment.yml
 conda activate bank_churn_model
+python
 ```
 
-Then you can open a python REPL with
-```bash
-python
->>> import pandas as pd
->>> customer = pd.DataFrame({'customer_age':45,
-                             'gender': 'M',
-                             'dependent_count':3,
-                             'education_level':'High School',
-                             'marital_status':,
-                             'tenure_per_age':,
-                             'utilisation_per_age':,
-                             'credit_lim_per_age':,
-                             'total_trans_amt_per_credit_lim':, 'total_trans_ct_per_credit_lim':,
-                            })
->>> from app.clf_funcs import classify()
+Then you can import and run the classify function using:
+```python
+>>> from app.clf_funcs import classify, OrdinalEncoder_custom
+>>> classify(
+        CLIENTNUM=768805383,
+        Attrition_Flag='Existing Customer',
+        Customer_Age=45,
+        Gender='M',
+        Dependent_count=3,
+        Education_Level='High School',
+        Marital_Status='Married',
+        Income_Category='$60k - 80k',
+        Card_Category='Blue',
+        Months_on_book=39,
+        Total_Relationship_Count=5,
+        Months_Inactive_12_mon=1,
+        Contacts_Count_12_mon=3,
+        Credit_Limit=12691,
+        Total_Revolving_Bal=777,
+        Avg_Open_To_Buy=11914,
+        Total_Amt_Chng_Q4_Q1=1.335,
+        Total_Trans_Amt=1144,
+        Total_Trans_Ct=42,
+        Total_Ct_Chng_Q4_Q1=1.625,
+        Avg_Utilization_Ratio=0.061
+    )
 ```
+
+The result should be returned as
+```False```
 
 
 # ADDITIONAL QUESTIONS:
